@@ -139,4 +139,5 @@ function (float)estimateNe_Inbreeding(o<Subpopulation>$ subpop)
 previous_N = subpop.getValue("previous_N");
 k = tabulateFecundity(subpop, previous_N);
 return (previous_N * mean(k) - 2) / (mean(k) - 1 + var(k) / mean(k));
+
 }
