@@ -4,7 +4,7 @@
 // Ne ~600 ~400 generation ago
 initialize() {
 	// base effective population size
-	defineGlobal("N", 1500);
+	defineGlobal("N", 5000);
 	// mutation rate
 	defineGlobal("MU", 1e-7);
 	// recombination rate
@@ -43,8 +43,8 @@ initialize() {
 }
 
 //Burn in period that end with a bottleneck event
-15000 late() { p1.outputSample(600);}
-15400 early() {p1.outputSample(28);} // second bottleneck event
+50400 late() { p1.outputSample(600);} // first bottleneck event
+50780 early() {p1.outputSample(28);} // second bottleneck event
 
 20 late() {
 	sim.simulationFinished();
