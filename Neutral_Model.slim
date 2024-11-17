@@ -58,8 +58,8 @@ initialize() {
 	}
 
 //Burn in period that end with a bottleneck event
-50400 late() { p1.outputSample(600);} // first bottleneck event
-50780 early() {p1.outputSample(28);} // second bottleneck event
+50400 late() { p1.setSubpopulationSize(600);} // first bottleneck event
+50780 early() {p1.setSubpopulationSize(28);} // second bottleneck event
 
 50800 late() {
 sim.simulationFinished();
@@ -70,19 +70,24 @@ sim.simulationFinished();
 	
 	
 	
+	
 function (float)estimateNe_Heterozygosity(o<Subpopulation>$ subpop){
 	pi = calcHeterozygosity(p1.genomes);
 	return pi / (4 * MU);
 }
+// Estimate the Ne based on inbreeding?
 function (float)estimateNe_Inbreeding(o<Subpopulation>$ subpop) { 
 	previous_N = subpop.individualCount; 
 	k = tabulateFecundity(subpop, previous_N); 
 	return (previous_N * mean(k) - 2) / (mean(k) - 1 + var(k) / mean(k)); 
 } 
+
+// ??
 function (integer)tabulateFecundity(o<Subpopulation>$ subpop, i$ previous_N)
 {
 parentIDs = subpop.individuals.pedigreeParentIDs;
 rescaledParentIDs = parentIDs - min(parentIDs);
 return tabulate(rescaledParentIDs, previous_N - 1);
 }
+
 
