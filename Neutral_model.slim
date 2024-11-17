@@ -13,12 +13,12 @@ initialize() {
 	defineGlobal("L", 1e7);
 	
 	//length chr 1 : 183775391 // we can use 1 only *o*
-<<<<<<< Updated upstream:Neutral_2v2.slim
+
 	defineGlobal("L1", 183775391); // put 10Mb
-=======
+
 	defineGlobal("L1", 1e7); // put 10Mb
 	initializeSLiMOptions(keepPedigrees=T);
->>>>>>> Stashed changes:Neutral_Model.slim
+
 	
 	//mutation rate
 	initializeMutationRate(MU);
@@ -44,10 +44,7 @@ initialize() {
 // add subpop
 1 early() {
 	sim.addSubpop("p1", 1500);
-<<<<<<< Updated upstream:Neutral_2v2.slim
-}
 
-=======
 	defineConstant("LOG", community.createLogFile("Ne_result.csv"));
 	LOG.addCycle();
 	LOG.addCustomColumn("N(t)", "p1.individualCount;");
@@ -59,16 +56,11 @@ initialize() {
 50400: late() {
 	LOG.logRow();
 	}
->>>>>>> Stashed changes:Neutral_Model.slim
+
 //Burn in period that end with a bottleneck event
 50400 late() { p1.outputSample(600);} // first bottleneck event
 50780 early() {p1.outputSample(28);} // second bottleneck event
 
-<<<<<<< Updated upstream:Neutral_2v2.slim
-20 late() {
-	sim.simulationFinished();
-	}
-=======
 50800 late() {
 sim.simulationFinished();
 }
@@ -93,4 +85,4 @@ parentIDs = subpop.individuals.pedigreeParentIDs;
 rescaledParentIDs = parentIDs - min(parentIDs);
 return tabulate(rescaledParentIDs, previous_N - 1);
 }
->>>>>>> Stashed changes:Neutral_Model.slim
+
