@@ -1,0 +1,92 @@
+// Non neutral model 
+
+/// killer whale Ne : SRKW : 27.4,
+// Ne ~600 ~400 generation ago
+initialize() {
+	// base effective population size
+	defineGlobal("N", 5000);
+	// mutation rate
+	defineGlobal("MU", 1e-7);
+	// recombination rate
+	defineGlobal("R", 1e-8);
+	//genome length
+	defineGlobal("L", 1e7);
+	
+	//length genomic element
+	defineGlobal("L1", 1e7); // put 10Mb
+	initializeSLiMOptions(keepPedigrees=T);
+	
+	//mutation rate
+	initializeMutationRate(MU);
+	// m1 mutation type: neutral
+	initializeMutationType("m1", 0.5, "f", 0.0); // neutral mutation
+	initializeMutationType("m3", 0.1, "g", 0.1, 0.2); // deleterious gamma distribution scale = 0.1, shape 0.2
+	initializeMutationType("m4", 0.8, "e", 0.1); // beneficial, incomplete dominance, exponential distribution mean = 0.1
+	// f = all mutation are m1, alternative gamma : mutation distribution gamma distribution
+
+// Implement deleterious and avantageous mutation based on gamma distribution (shape 0.2 and scale 0.1)
+ 
+	
+	
+	// Define genomic element types for each chromosome 
+	initializeGenomicElementType("g1", m1, 1.0);
+	
+	// Initialize chromosomes
+	initializeGenomicElement(g1, 0, L1-1);
+	
+	//Recombination rate
+	initializeRecombinationRate(R);
+	
+}
+
+// add subpop
+1 early() {
+	sim.addSubpop("p1", 1500);
+	defineConstant("LOG", community.createLogFile("Ne_result_non_neutral.csv"));
+	LOG.addCycle();
+	LOG.addCustomColumn("N(t)", "p1.individualCount;");
+	LOG.addCustomColumn("Ne-heterozygosity", "estimateNe_Heterozygosity(p1);");
+	LOG.addCustomColumn("Ne-inbreeding","estimateNe_Inbreeding(p1);");
+	
+
+}
+early() {
+	meanFitness = mean(p1.cachedFitness(NULL));
+	newSize = asInteger(p1.individualCount * meanFitness);
+	p1.setSubpopulationSize(newSize);
+}
+50400: late() {
+	LOG.logRow();
+	}
+
+//Burn in period that end with a bottleneck event
+50400 late() { p1.setSubpopulationSize(600);} // first bottleneck event
+50780 early() {p1.setSubpopulationSize(28);} // second bottleneck event
+
+50800 late() {
+sim.simulationFinished();
+}
+	
+	
+
+	
+	
+	
+function (float)estimateNe_Heterozygosity(o<Subpopulation>$ subpop){
+	pi = calcHeterozygosity(p1.genomes);
+	return pi / (4 * MU);
+}
+// Estimate the Ne based on inbreeding?
+function (float)estimateNe_Inbreeding(o<Subpopulation>$ subpop) { 
+	previous_N = subpop.individualCount; 
+	k = tabulateFecundity(subpop, previous_N); 
+	return (previous_N * mean(k) - 2) / (mean(k) - 1 + var(k) / mean(k)); 
+} 
+
+// ??
+function (integer)tabulateFecundity(o<Subpopulation>$ subpop, i$ previous_N)
+{
+parentIDs = subpop.individuals.pedigreeParentIDs;
+rescaledParentIDs = parentIDs - min(parentIDs);
+return tabulate(rescaledParentIDs, previous_N - 1);
+}
