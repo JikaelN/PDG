@@ -20,13 +20,15 @@ initialize() {
 	initializeMutationRate(MU);
 	// m1 mutation type: neutral
 	initializeMutationType("m1", 0.5, "f", 0.0); // neutral mutation
-	initializeMutationType("m3", 0.1, "g", 0.1, 0.2); // deleterious gamma distribution scale = 0.1, shape 0.2
-	initializeMutationType("m4", 0.8, "e", 0.1); // beneficial, incomplete dominance, exponential distribution mean = 0.1
+	initializeMutationType("m3", 0.1, "g", -0.02, 0.2); // deleterious gamma distribution, effect on fitness -0.01, shape 0.2, scale = |mean| / shape = 0.1
+	//m3.convertToSubstitution = F;
+	initializeMutationType("m4", 0.8, "e", 0.05); // beneficial, incomplete dominance, exponential distribution mean = 0.1
+	//m4.convertToSubstitution = F;
 	// f = all mutation are m1, alternative gamma : mutation distribution gamma distribution
 
 	
 	// Define genomic element types for each chromosome 
-	initializeGenomicElementType("g1", m1, 1.0);
+	initializeGenomicElementType("g1", c(m1,m3, m4), c(0.85,0.1,0.05)); // last vector is the coef of each mutation
 	
 	// Initialize chromosomes
 	initializeGenomicElement(g1, 0, L1-1);
@@ -38,7 +40,7 @@ initialize() {
 
 // add subpop
 1 early() {
-	sim.addSubpop("p1", 1500);
+	sim.addSubpop("p1", N);
 	defineConstant("LOG", community.createLogFile("Ne_result_non_neutral.csv"));
 	LOG.addCycle();
 	LOG.addCustomColumn("N(t)", "p1.individualCount;");
@@ -47,11 +49,7 @@ initialize() {
 	
 
 }
-early() {
-	meanFitness = mean(p1.cachedFitness(NULL));
-	newSize = asInteger(p1.individualCount * meanFitness);
-	p1.setSubpopulationSize(newSize);
-}
+
 50400: late() {
 	LOG.logRow();
 	}
@@ -59,6 +57,9 @@ early() {
 //Burn in period that end with a bottleneck event
 50400 late() { p1.setSubpopulationSize(600);} // first bottleneck event
 50780 early() {p1.setSubpopulationSize(28);} // second bottleneck event
+
+
+
 
 50800 late() {
 sim.simulationFinished();
