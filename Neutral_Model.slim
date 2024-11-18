@@ -6,15 +6,12 @@ initialize() {
 	// base effective population size
 	defineGlobal("N", 5000);
 	// mutation rate
-	defineGlobal("MU", 1e-7);
+	defineGlobal("MU", 1e-7); // Keep 1e-7 if you increase there is to much mutation at each generation > SLiM crash
 	// recombination rate
-	defineGlobal("R", 1e-8);
+	defineGlobal("R", 1e-7);
 	//genome length
-	defineGlobal("L", 1e7);
+	//defineGlobal("L", 1e7);
 	
-	//length chr 1 : 183775391 // we can use 1 only *o*
-
-	defineGlobal("L1", 183775391); // put 10Mb
 
 	defineGlobal("L1", 1e7); // put 10Mb
 	initializeSLiMOptions(keepPedigrees=T);
@@ -39,7 +36,7 @@ initialize() {
 
 // add subpop
 1 early() {
-	sim.addSubpop("p1", 1500);
+	sim.addSubpop("p1", N);
 
 	defineConstant("LOG", community.createLogFile("Ne_result.csv"));
 	LOG.addCycle();
@@ -55,7 +52,7 @@ initialize() {
 
 //Burn in period that end with a bottleneck event
 50400 late() { p1.setSubpopulationSize(600);} // first bottleneck event
-50780 early() {p1.setSubpopulationSize(28);} // second bottleneck event
+50780 early() {p1.setSubpopulationSize(76);} // second bottleneck event
 
 50800 late() {
 sim.simulationFinished();
